@@ -37,7 +37,7 @@ import lsst.pipe.base as pipeBase
 from lsst.meas.algorithms import LoadIndexedReferenceObjectsTask, ReferenceSourceSelectorTask
 from lsst.meas.algorithms import getRefFluxField
 from lsst.pipe.tasks.colorterms import ColortermLibrary
-from lsst.afw.image import fluxErrFromABMagErr, abMagErrFromFluxErr
+from lsst.afw.image import abMagErrFromFluxErr
 import lsst.geom
 
 __all__ = ['FgcmLoadReferenceCatalogConfig', 'FgcmLoadReferenceCatalogTask']

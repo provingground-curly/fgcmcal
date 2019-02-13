@@ -621,7 +621,8 @@ class FgcmBuildStarsTask(pipeBase.CmdLineTask):
                     # nans below.
                     np.warnings.simplefilter("ignore")
 
-                    tempAperCat[instMagInKey][:] = -2.5 * np.log10(sources[instFluxAperInKey][goodSrc.selected])
+                    tempAperCat[instMagInKey][:] = -2.5 * \
+                        np.log10(sources[instFluxAperInKey][goodSrc.selected])
                     tempAperCat[instMagErrInKey][:] = (2.5 / np.log(10.)) * (
                         sources[instFluxErrAperInKey][goodSrc.selected] /
                         sources[instFluxAperInKey][goodSrc.selected])

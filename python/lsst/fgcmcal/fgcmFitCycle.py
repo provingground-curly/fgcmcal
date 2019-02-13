@@ -84,6 +84,17 @@ class FgcmFitCycleConfig(pexConfig.Config):
         dtype=bool,
         default=False,
     )
+    refStarSnMin = pexConfig.Field(
+        doc="Reference star signal-to-noise minimum to use in calibration.  Set to <=0 for no cut.",
+        dtype=float,
+        default=20.0,
+    )
+    refStarOutlierNSig = pexConfig.Field(
+        doc=("Number of sigma compared to average mag for reference star to be considered an outlier. "
+             "Computed per-band, and if it is an outlier in any band it is rejected from fits."),
+        dtype=float,
+        default=4.0,
+    )
     nCore = pexConfig.Field(
         doc="Number of cores to use",
         dtype=int,
@@ -1067,6 +1078,8 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                       'expGrayRecoverCut': self.config.expGrayRecoverCut,
                       'expVarGrayPhotometricCut': self.config.expVarGrayPhotometricCut,
                       'expGrayErrRecoverCut': self.config.expGrayErrRecoverCut,
+                      'refStarSnMin': self.config.refStarSnMin,
+                      'refStarOutlierNSig': self.config.refStarOutlierNSig,
                       'illegalValue': -9999.0,  # internally used by fgcm.
                       'starColorCuts': starColorCutList,
                       'aperCorrFitNBins': self.config.aperCorrFitNBins,
@@ -1187,6 +1200,10 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                                        parCat['parRetrievedLnPwvNightlyOffset'].size),
                                       ('COMPABSTHROUGHPUT', 'f8',
                                        parCat['compAbsThroughput'].size),
+                                      ('COMPREFOFFSET', 'f8',
+                                       parCat['compRefOffset'].size),
+                                      ('COMPREFSIGMA', 'f8',
+                                       parCat['compRefSigma'].size),
                                       ('COMPAPERCORRPIVOT', 'f8',
                                        parCat['compAperCorrPivot'].size),
                                       ('COMPAPERCORRSLOPE', 'f8',
@@ -1237,6 +1254,8 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
         inParams['PARRETRIEVEDLNPWVOFFSET'] = parCat['parRetrievedLnPwvOffset']
         inParams['PARRETRIEVEDLNPWVNIGHTLYOFFSET'][:] = parCat['parRetrievedLnPwvNightlyOffset'][0, :]
         inParams['COMPABSTHROUGHPUT'][:] = parCat['compAbsThroughput'][0, :]
+        inParams['COMPREFOFFSET'][:] = parCat['compRefOffset'][0, :]
+        inParams['COMPREFSIGMA'][:] = parCat['compRefSigma'][0, :]
         inParams['COMPAPERCORRPIVOT'][:] = parCat['compAperCorrPivot'][0, :]
         inParams['COMPAPERCORRSLOPE'][:] = parCat['compAperCorrSlope'][0, :]
         inParams['COMPAPERCORRSLOPEERR'][:] = parCat['compAperCorrSlopeErr'][0, :]
@@ -1415,6 +1434,12 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
         parSchema.addField('compAbsThroughput', type='ArrayD',
                            doc='Absolute throughput (relative to transmission curves)',
                            size=pars['COMPABSTHROUGHPUT'].size)
+        parSchema.addField('compRefOffset', type='ArrayD',
+                           doc='Offset between reference stars and calibrated stars',
+                           size=pars['COMPREFOFFSET'].size)
+        parSchema.addField('compRefSigma', type='ArrayD',
+                           doc='Width of reference star/calibrated star distribution',
+                           size=pars['COMPREFSIGMA'].size)
         parSchema.addField('compAperCorrPivot', type='ArrayD', doc='Aperture correction pivot',
                            size=pars['COMPAPERCORRPIVOT'].size)
         parSchema.addField('compAperCorrSlope', type='ArrayD', doc='Aperture correction slope',
@@ -1520,7 +1545,7 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                     'parQeSysIntercept',
                     'parQeSysSlope', 'parRetrievedLnPwvNightlyOffset', 'compAperCorrPivot',
                     'parFilterOffset', 'parFilterOffsetFitFlag',
-                    'compAbsThroughput',
+                    'compAbsThroughput', 'compRefOffset', 'compRefSigma',
                     'compAperCorrSlope', 'compAperCorrSlopeErr', 'compAperCorrRange',
                     'compModelErrExptimePivot', 'compModelErrFwhmPivot',
                     'compModelErrSkyPivot', 'compModelErrPars',

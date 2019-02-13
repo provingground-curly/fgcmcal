@@ -615,15 +615,21 @@ class FgcmBuildStarsTask(pipeBase.CmdLineTask):
                 tempAperCat = afwTable.BaseCatalog(aperVisitCatalog.schema)
                 tempAperCat.reserve(goodSrc.selected.sum())
                 tempAperCat.extend(sources[goodSrc.selected], mapper=aperMapper)
-                tempAperCat[instMagInKey][:] = -2.5 * np.log10(sources[instFluxAperInKey][goodSrc.selected])
-                tempAperCat[instMagErrInKey][:] = (2.5 / np.log(10.)) * (
-                    sources[instFluxErrAperInKey][goodSrc.selected] /
-                    sources[instFluxAperInKey][goodSrc.selected])
-                tempAperCat[instMagOutKey][:] = -2.5 * np.log10(
-                    sources[instFluxAperOutKey][goodSrc.selected])
-                tempAperCat[instMagErrOutKey][:] = (2.5 / np.log(10.)) * (
-                    sources[instFluxErrAperOutKey][goodSrc.selected] /
-                    sources[instFluxAperOutKey][goodSrc.selected])
+
+                with np.warnings.catch_warnings():
+                    # Ignore warnings, we will filter infinities and
+                    # nans below.
+                    np.warnings.simplefilter("ignore")
+
+                    tempAperCat[instMagInKey][:] = -2.5 * np.log10(sources[instFluxAperInKey][goodSrc.selected])
+                    tempAperCat[instMagErrInKey][:] = (2.5 / np.log(10.)) * (
+                        sources[instFluxErrAperInKey][goodSrc.selected] /
+                        sources[instFluxAperInKey][goodSrc.selected])
+                    tempAperCat[instMagOutKey][:] = -2.5 * np.log10(
+                        sources[instFluxAperOutKey][goodSrc.selected])
+                    tempAperCat[instMagErrOutKey][:] = (2.5 / np.log(10.)) * (
+                        sources[instFluxErrAperOutKey][goodSrc.selected] /
+                        sources[instFluxAperOutKey][goodSrc.selected])
 
                 aperVisitCatalog.extend(tempAperCat)
 

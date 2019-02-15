@@ -95,6 +95,11 @@ class FgcmFitCycleConfig(pexConfig.Config):
         dtype=float,
         default=4.0,
     )
+    applyRefStarColorCuts = pexConfig.Field(
+        doc="Apply color cuts to reference stars?",
+        dtype=bool,
+        default=True,
+    )
     nCore = pexConfig.Field(
         doc="Number of cores to use",
         dtype=int,
@@ -1080,6 +1085,7 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                       'expGrayErrRecoverCut': self.config.expGrayErrRecoverCut,
                       'refStarSnMin': self.config.refStarSnMin,
                       'refStarOutlierNSig': self.config.refStarOutlierNSig,
+                      'applyRefStarColorCuts': self.config.applyRefStarColorCuts,
                       'illegalValue': -9999.0,  # internally used by fgcm.
                       'starColorCuts': starColorCutList,
                       'aperCorrFitNBins': self.config.aperCorrFitNBins,

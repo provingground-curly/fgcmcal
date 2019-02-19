@@ -71,10 +71,8 @@ class FgcmFitCycleConfig(pexConfig.Config):
         dtype=int,
         default=(0,),
     )
-    filterToBand = pexConfig.DictField(
-        doc=("Dictionary to map filterName (e.g. physical filter) to band (e.g. abstract filter). "
-             "With this mapping different filters (e.g. HSC r and r2) can be calibrated to the same "
-             "'r' band."),
+    filterMap = pexConfig.DictField(
+        doc="Mapping from 'filterName' to band.",
         keytype=str,
         itemtype=str,
         default={},
@@ -566,8 +564,7 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
         camera = butler.get('camera')
         configDict = self._makeConfigDict(camera)
 
-        fgcmLut, lutIndexVals, lutStd = self._loadFgcmLut(butler,
-                                                          filterToBand=self.config.filterToBand)
+        fgcmLut, lutIndexVals, lutStd = self._loadFgcmLut(butler)
 
         # next we need the exposure/visit information
 
@@ -762,15 +759,13 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                 raise RuntimeError("Could not find fgcmReferenceStars in repo, and "
                                    "doReferenceCalibration is True.")
 
-    def _loadFgcmLut(self, butler, filterToBand=None):
+    def _loadFgcmLut(self, butler):
         """
         Load the FGCM look-up-table
 
         Parameters
         ----------
         butler: `lsst.daf.persistence.Butler`
-        filterToBand: `dict`
-           Dictionary mapping filters to bands (see self.config.filterToBand)
 
         Returns
         -------
@@ -884,7 +879,7 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
         # references to the temporary objects (lutCat, lutFlat, lutDerivFlat)
         # will fall out of scope and can be cleaned up by the garbage collector.
         fgcmLut = fgcm.FgcmLUT(lutIndexVals, lutFlat, lutDerivFlat, lutStd,
-                               filterToBand=self.config.filterToBand)
+                               filterToBand=dict(self.config.filterMap))
 
         return fgcmLut, lutIndexVals, lutStd
 
@@ -1049,7 +1044,7 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                       'fitBands': list(fitBands),
                       'notFitBands': list(notFitBands),
                       'requiredBands': list(requiredBands),
-                      'filterToBand': dict(self.config.filterToBand),
+                      'filterToBand': dict(self.config.filterMap),
                       'logLevel': 'INFO',  # FIXME
                       'nCore': self.config.nCore,
                       'nStarPerRun': self.config.nStarPerRun,

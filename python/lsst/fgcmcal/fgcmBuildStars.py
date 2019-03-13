@@ -744,7 +744,7 @@ class FgcmBuildStarsTask(pipeBase.CmdLineTask):
         fgcmMakeStars = fgcm.FgcmMakeStars(starConfig)
 
         # make the primary stars
-        #  note that the ra/dec native Angle format is radians
+        # note that the ra/dec native Angle format is radians
         # We determine the conversion from the native units (typically
         # radians) to degrees for the first observation.  This allows us
         # to treate ra/dec as numpy arrays rather than Angles, which would
@@ -794,7 +794,7 @@ class FgcmBuildStarsTask(pipeBase.CmdLineTask):
         butler.put(fgcmStarIndicesCat, 'fgcmStarIndices')
 
         if self.config.doReferenceMatches:
-            refSchema = self._makeFgcmRefSchema(len(self.config.referenceBands))
+            refSchema = self._makeFgcmRefSchema(len(referenceFilterNames))
 
             fgcmRefCat = afwTable.BaseCatalog(refSchema)
             fgcmRefCat.reserve(fgcmMakeStars.referenceCat.size)

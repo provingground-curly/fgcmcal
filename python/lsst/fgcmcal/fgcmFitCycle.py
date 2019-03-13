@@ -1153,7 +1153,6 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                                        ('LNPWVGLOBALUNIT', 'f8'),
                                        ('O3UNIT', 'f8'),
                                        ('QESYSUNIT', 'f8'),
-                                       ('QESYSSLOPEUNIT', 'f8'),
                                        ('FILTEROFFSETUNIT', 'f8'),
                                        ('HASEXTERNALPWV', 'i2'),
                                        ('HASEXTERNALTAU', 'i2')])
@@ -1170,7 +1169,6 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
         inParInfo['LNPWVGLOBALUNIT'] = parCat['lnPwvGlobalUnit']
         inParInfo['O3UNIT'] = parCat['o3Unit']
         inParInfo['QESYSUNIT'] = parCat['qeSysUnit']
-        inParInfo['QESYSSLOPEUNIT'] = parCat['qeSysSlopeUnit']
         inParInfo['FILTEROFFSETUNIT'] = parCat['filterOffsetUnit']
         inParInfo['HASEXTERNALPWV'] = parCat['hasExternalPwv']
         inParInfo['HASEXTERNALTAU'] = parCat['hasExternalTau']
@@ -1189,8 +1187,8 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                                        parCat['parLnPwvQuadratic'].size),
                                       ('PARQESYSINTERCEPT', 'f8',
                                        parCat['parQeSysIntercept'].size),
-                                      ('PARQESYSSLOPE', 'f8',
-                                       parCat['parQeSysSlope'].size),
+                                      ('COMPQESYSSLOPE', 'f8',
+                                       parCat['compQeSysSlope'].size),
                                       ('PARFILTEROFFSET', 'f8',
                                        parCat['parFilterOffset'].size),
                                       ('PARFILTEROFFSETFITFLAG', 'i2',
@@ -1248,7 +1246,7 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
         inParams['PARLNPWVSLOPE'][:] = parCat['parLnPwvSlope'][0, :]
         inParams['PARLNPWVQUADRATIC'][:] = parCat['parLnPwvQuadratic'][0, :]
         inParams['PARQESYSINTERCEPT'][:] = parCat['parQeSysIntercept'][0, :]
-        inParams['PARQESYSSLOPE'][:] = parCat['parQeSysSlope'][0, :]
+        inParams['COMPQESYSSLOPE'][:] = parCat['compQeSysSlope'][0, :]
         inParams['PARFILTEROFFSET'][:] = parCat['parFilterOffset'][0, :]
         inParams['PARFILTEROFFSETFITFLAG'][:] = parCat['parFilterOffsetFitFlag'][0, :]
         inParams['PARRETRIEVEDLNPWVSCALE'] = parCat['parRetrievedLnPwvScale']
@@ -1395,7 +1393,6 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                            doc='Step units for global ln(pwv) parameters')
         parSchema.addField('o3Unit', type=np.float64, doc='Step units for O3')
         parSchema.addField('qeSysUnit', type=np.float64, doc='Step units for mirror gray')
-        parSchema.addField('qeSysSlopeUnit', type=np.float64, doc='Step units for mirror gray slope')
         parSchema.addField('filterOffsetUnit', type=np.float64, doc='Step units for filter offset')
         parSchema.addField('hasExternalPwv', type=np.int32, doc='Parameters fit using external pwv')
         parSchema.addField('hasExternalTau', type=np.int32, doc='Parameters fit using external tau')
@@ -1419,8 +1416,8 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                            size=pars['PARLNPWVQUADRATIC'].size)
         parSchema.addField('parQeSysIntercept', type='ArrayD', doc='Mirror gray intercept parameter vector',
                            size=pars['PARQESYSINTERCEPT'].size)
-        parSchema.addField('parQeSysSlope', type='ArrayD', doc='Mirror gray slope parameter vector',
-                           size=pars['PARQESYSSLOPE'].size)
+        parSchema.addField('compQeSysSlope', type='ArrayD', doc='Mirror gray slope parameter vector',
+                           size=pars[0]['COMPQESYSSLOPE'].size)
         parSchema.addField('parFilterOffset', type='ArrayD', doc='Filter offset parameter vector',
                            size=pars['PARFILTEROFFSET'].size)
         parSchema.addField('parFilterOffsetFitFlag', type='ArrayI', doc='Filter offset parameter fit flag',
@@ -1531,7 +1528,6 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
         rec['lnPwvGlobalUnit'] = parInfo['LNPWVGLOBALUNIT']
         rec['o3Unit'] = parInfo['O3UNIT']
         rec['qeSysUnit'] = parInfo['QESYSUNIT']
-        rec['qeSysSlopeUnit'] = parInfo['QESYSSLOPEUNIT']
         rec['filterOffsetUnit'] = parInfo['FILTEROFFSETUNIT']
         # note these are not currently supported here.
         rec['hasExternalPwv'] = 0
@@ -1543,8 +1539,8 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
 
         arrNames = ['parAlpha', 'parO3', 'parLnTauIntercept', 'parLnTauSlope',
                     'parLnPwvIntercept', 'parLnPwvSlope', 'parLnPwvQuadratic',
-                    'parQeSysIntercept',
-                    'parQeSysSlope', 'parRetrievedLnPwvNightlyOffset', 'compAperCorrPivot',
+                    'parQeSysIntercept', 'compQeSysSlope',
+                    'parRetrievedLnPwvNightlyOffset', 'compAperCorrPivot',
                     'parFilterOffset', 'parFilterOffsetFitFlag',
                     'compAbsThroughput', 'compRefOffset', 'compRefSigma',
                     'compAperCorrSlope', 'compAperCorrSlopeErr', 'compAperCorrRange',

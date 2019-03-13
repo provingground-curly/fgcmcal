@@ -1116,7 +1116,7 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                       'useRetrievedTauInit': False,
                       'tauRetrievalMinCCDPerNight': 500,
                       'modelMagErrors': self.config.modelMagErrors,
-                      'instrumentParsePerBand': self.config.instrumentParsPerBand,
+                      'instrumentParsPerBand': self.config.instrumentParsPerBand,
                       'instrumentSlopeMinDeltaT': self.config.instrumentSlopeMinDeltaT,
                       'printOnly': False,
                       'outputStars': False,

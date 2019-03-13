@@ -382,7 +382,7 @@ class FgcmFitCycleConfig(pexConfig.Config):
     )
     instrumentSlopeMinDeltaT = pexConfig.Field(
         doc=("Minimum time change (in days) between observations to use in constraining "
-             "instrument slope.")
+             "instrument slope."),
         dtype=float,
         default=20.0,
     )

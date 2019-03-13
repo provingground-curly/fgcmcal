@@ -375,6 +375,17 @@ class FgcmFitCycleConfig(pexConfig.Config):
         dtype=bool,
         default=False,
     )
+    instrumentParsPerBand = pexConfig.Field(
+        doc="Model instrumental variation over time per band instead of as a gray term",
+        dtype=bool,
+        default=False,
+    )
+    instrumentSlopeMinDeltaT = pexConfig.Field(
+        doc=("Minimum time change (in days) between observations to use in constraining "
+             "instrument slope.")
+        dtype=float,
+        default=20.0,
+    )
     outputStandardsBeforeFinalCycle = pexConfig.Field(
         doc="Output standard stars prior to final cycle?  Used in debugging.",
         dtype=bool,
@@ -1105,6 +1116,8 @@ class FgcmFitCycleTask(pipeBase.CmdLineTask):
                       'useRetrievedTauInit': False,
                       'tauRetrievalMinCCDPerNight': 500,
                       'modelMagErrors': self.config.modelMagErrors,
+                      'instrumentParsePerBand': self.config.instrumentParsPerBand,
+                      'instrumentSlopeMinDeltaT': self.config.instrumentSlopeMinDeltaT,
                       'printOnly': False,
                       'outputStars': False,
                       'clobber': True,
